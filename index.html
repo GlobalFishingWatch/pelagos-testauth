@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Pelagos - Authentication Demo</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Pelagos - Authentication Demo</a>
+        </div>
+      </div><!-- /.container-fluid -->
+    </nav>
+
+    <div class="container">
+      <div id="authentication-status" class="well">
+
+      </div>
+
+      <div id="authentication-info" class="panel panel-default">
+        <div class="panel-heading">
+          <h4>Authentication information</h4>
+        </div>
+        <div class="panel-body">
+          <dl>
+            <dt>Token</dt>
+            <dd style="overflow-x: scroll">
+              <code id="token"></code>
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <div id="user-info" class="panel panel-default">
+        <div class="panel-heading">
+          <h4>User information</h4>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-3">
+              <img id="photo" class="img-responsive" src="" alt="Profile Photo">
+            </div>
+            <div class="col-md-9">
+              <dl>
+                <dt>Display Name</dt>
+                <dd id="display-name"></dd>
+
+                <dt>Email</dt>
+                <dd id="email"></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <a
+        id="login"
+        class="btn btn-block btn-primary btn-lg"
+        href="https://skytruth-pleuston.appspot.com/v1/authorize?response_type=token&client_id=client&redirect_uri=https%3A%2F%2Fstorage.googleapis.com%2Fworld-fishing-827%2Fpelagos%2Fcomponents%2Fdemo%2Findex.html">
+        Login
+      </a>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+    <script>
+      $(document).ready(function() {
+        var status = $("#authentication-status");
+        var info = $("#authentication-info");
+        var infoToken = $("#token");
+        var user = $("#user-info");
+        var userDisplayName = $("#display-name");
+        var userEmail = $("#email");
+        var userPhoto = $("#photo");
+        var login = $("#login");
+
+        status.html("You are <b>not</b> authenticated");
+        info.hide();
+        user.hide();
+
+        if (window.location.hash.length > 0) {
+          var pairs = window.location.hash.substring(1).split("&");
+          window.location.hash = "";
+          for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i];
+            if (pair.match(/^access_token=.*/)) {
+              status.html("You are authenticated");
+              login.html("Login again");
+
+              var token = pair.split("=")[1];
+              infoToken.html(token);
+              info.show();
+
+              $.ajax({
+                url: "https://skytruth-pleuston.appspot.com/v1/me",
+                headers: {
+                  "Authorization": "Bearer " + token,
+                  "Content-Type": "application/json"
+                },
+                method: "GET",
+                dataType: "json",
+                success: function(data) {
+                  userDisplayName.html(data.displayName);
+                  userEmail.html(data.email);
+                  userPhoto.attr("src", data.photos.main);
+                  user.show();
+                }
+              });
+
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
+
