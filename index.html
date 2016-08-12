@@ -70,7 +70,7 @@
       <a
         id="login"
         class="btn btn-block btn-primary btn-lg"
-        href="https://skytruth-pleuston.appspot.com/v1/authorize?response_type=token&client_id=client&redirect_uri=https%3A%2F%2Fstorage.googleapis.com%2Fworld-fishing-827%2Fpelagos%2Fcomponents%2Fdemo%2Findex.html">
+        href="https://oauthsandbox-dot-skytruth-pleuston.appspot.com/v1/authorize?response_type=token&client_id=client&redirect_uri=https%3A%2F%2Fstorage.googleapis.com%2Fworld-fishing-827%2Fpelagos%2Fcomponents%2Fdemo%2Findex.html">
         Login
       </a>
     </div>
@@ -108,6 +108,15 @@
               var token = pair.split("=")[1];
               infoToken.html(token);
               info.show();
+
+              var tokenQuery = encodeURIComponent(JSON.stringify({
+                "Authorization": "Bearer " + token
+              }));
+
+              var iframe = document.createElement('iframe');
+              iframe.src = "http://map.globalfishingwatch.org/viz?workspace=/workspace/benthos-pipeline-beta-tileset-daily-updater&headers=" + tokenQuery;
+              iframe.style = "width: 100%; height: 768px; margin-top: 1em";
+              document.body.appendChild(iframe);
 
               $.ajax({
                 url: "https://skytruth-pleuston.appspot.com/v1/me",
